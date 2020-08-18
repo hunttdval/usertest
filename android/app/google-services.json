@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "892066758507",
+    "firebase_url": "https://phone-login-414b0.firebaseio.com",
+    "project_id": "phone-login-414b0",
+    "storage_bucket": "phone-login-414b0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:892066758507:android:acfb22e4166d5c9be9962e",
+        "android_client_info": {
+          "package_name": "com.myke254.login_phone_number"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "892066758507-h7hhlr7shsel6od6dsj6da2gbe4ibono.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBNhV_vNSwXK33jazB_u69OzixUWu4GLhI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "892066758507-h7hhlr7shsel6od6dsj6da2gbe4ibono.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
