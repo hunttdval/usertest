@@ -1,6 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:login_phone_number/models/users.dart';
 import 'package:login_phone_number/screens/home.dart';
 import 'package:login_phone_number/screens/login.dart';
 
@@ -8,7 +8,7 @@ class AuthService {
   //handles Auth
   handleAuth() {
     return StreamBuilder(
-        stream: FirebaseAuth.instance.onAuthStateChanged,
+        stream: FirebaseAuth.instance.authStateChanges(),
         builder: (BuildContext context, snapshot) {
           if (snapshot.hasData) {
             return HomePage();
@@ -24,28 +24,26 @@ class AuthService {
   }
 
 //sign in
-  signIn(AuthCredential authCreds) {
-    FirebaseAuth.instance.signInWithCredential(authCreds);
+  signIn(AuthCredential authCreds) async {
+    try {
+      UserCredential result =
+          await FirebaseAuth.instance.signInWithCredential(authCreds);
+
+      User user = result.user;
+      await FirebaseFirestore.instance.collection('user').doc(user.uid).set({
+        'uid': user.uid,
+        'phone': int.parse(user.phoneNumber),
+        'reqid': '0'
+      });
+    } catch (e) {
+      print(e);
+    }
   }
 
   //sign in with OTP
-  signInWithOTP(smsCode, verId) {
-    AuthCredential authCreds = PhoneAuthProvider.getCredential(
-        verificationId: verId, smsCode: smsCode);
+  signInWithOTP(smsCode, verId) async {
+    AuthCredential authCreds =
+        PhoneAuthProvider.credential(verificationId: verId, smsCode: smsCode);
     signIn(authCreds);
-  }
-
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  //create user object based on FirebaseUser
-  User _userFromFirebaseUser(FirebaseUser user) {
-    print(user.displayName);
-    return user != null ? User(uid: user.uid) : null;
-  }
-
-  //auth change user stream
-  Stream<User> get user {
-    return _auth.onAuthStateChanged
-        //.map((FirebaseUser user) => _userFromFirebaseUser(user));
-        .map(_userFromFirebaseUser);
   }
 }

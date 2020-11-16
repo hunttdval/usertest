@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:login_phone_number/services/authservice.dart';
+import 'package:flutter_signin_button/flutter_signin_button.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -39,29 +40,18 @@ class _LoginPageState extends State<LoginPage> {
               children: <Widget>[
                 Padding(
                   padding: EdgeInsets.only(right: 25, left: 25),
-                  child:
-//                   InternationalPhoneInput(
-//                     decoration:
-//                     InputDecoration(hintText: ' enter phone number'),
-//                     initialPhoneNumber: phoneNo,
-//                     onPhoneNumberChange: onPhoneNumberChange,
-//                     initialSelection: "KE",
-//                     enabledCountries: ['+254'],
-//                     showCountryCodes: true,
-//                     showCountryFlags: true,
-//                   ),
-
-                      TextFormField(
+                  child: TextFormField(
                     // ignore: missing_return
                     validator: (value) {
-                      if ((value).isEmpty || !(value).startsWith("+254")) {
+                      if ((value).isEmpty) {
                         return 'please enter a valid phone number';
                       }
                     },
                     keyboardType: TextInputType.phone,
                     decoration: InputDecoration(
-                        hintText:
-                            'phone number(example: ' + '+254 xxx-xxx-xxx)'),
+                      labelText: 'phone number',
+                      prefixText: '+254',
+                    ),
                     onChanged: (val) {
                       setState(() {
                         this.phoneNo = val;
@@ -73,6 +63,12 @@ class _LoginPageState extends State<LoginPage> {
                     ? Padding(
                         padding: EdgeInsets.only(right: 25, left: 25),
                         child: TextFormField(
+                          // ignore: missing_return
+                          validator: (value) {
+                            if ((value).isEmpty) {
+                              return 'invalid verification code';
+                            }
+                          },
                           keyboardType: TextInputType.phone,
                           decoration: InputDecoration(
                               hintText: 'Enter verification code sent'),
@@ -93,7 +89,7 @@ class _LoginPageState extends State<LoginPage> {
                           codeSent
                               ? AuthService()
                                   .signInWithOTP(smsCode, verificationId)
-                              : verifyPhone(phoneNo);
+                              : verifyPhone('+254' + phoneNo.toString());
                         } else {
                           print('invalid phone number');
                         }
@@ -103,7 +99,18 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                   ),
-                )
+                ),
+                Divider(
+                  color: Colors.brown,
+                ),
+                SizedBox(
+                  height: 20,
+                  child: Text('OR'),
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                SignInButton(Buttons.Google, onPressed: () {})
               ],
             ),
           ),
@@ -113,13 +120,11 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> verifyPhone(phoneNo) async {
-    final PhoneVerificationCompleted verified = (AuthCredential authResult) {
+    final PhoneVerificationCompleted verified =
+        (AuthCredential authResult) async {
       AuthService().signIn(authResult);
     };
-    final PhoneVerificationFailed verificationFailed =
-        (AuthException authException) {
-      print('${authException.message}');
-    };
+    final PhoneVerificationFailed verificationFailed = (authException) {};
     final PhoneCodeSent smsSent = (String verId, [int forceResend]) {
       this.verificationId = verId;
       setState(() {
@@ -131,7 +136,7 @@ class _LoginPageState extends State<LoginPage> {
     };
     await FirebaseAuth.instance.verifyPhoneNumber(
         phoneNumber: phoneNo,
-        timeout: Duration(seconds: 5),
+        timeout: Duration(seconds: 20),
         verificationCompleted: verified,
         verificationFailed: verificationFailed,
         codeSent: smsSent,
